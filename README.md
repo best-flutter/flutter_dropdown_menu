@@ -11,7 +11,7 @@ A dropdown menu for Flutter.
 
 ```
 
-dropdown_menu : ^1.0.0
+dropdown_menu : ^1.0.1
 
 ```
 

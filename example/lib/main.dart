@@ -155,6 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           height: maxHeight * 0.8.toDouble())
                     ],
                     controller: controller,
+                    switchStyle: DropdownMenuShowHideSwitchStyle.directHideAnimationShow,
                     child: new ListView(
                       children:
                           [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((dynamic i) {

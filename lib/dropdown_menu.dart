@@ -14,6 +14,9 @@ enum DropdownMenuShowHideSwitchStyle {
   /// the showing menu will direct hide without animation
   directHideAnimationShow,
 
+  /// the showing menu will direct hide without animation, and another menu shows without animation
+  directHideDirectShow,
+
   /// the showing menu will hide with animation,and the same time another menu shows with animation
   animationHideAnimationShow,
 
@@ -300,7 +303,15 @@ class _DropdownMenuState extends State<DropdownMenu>
       switch (widget.switchStyle) {
         case DropdownMenuShowHideSwitchStyle.directHideAnimationShow:
           {
-            _dropdownAnimations[index].value = 0.0;
+            _dropdownAnimations[_activeIndex].value = 0.0;
+            _dropdownAnimations[index].value = 1.0;
+            _activeIndex = index;
+
+            setState(() {
+              _show = true;
+            });
+
+            return new Future.value(null);
           }
 
           break;
@@ -309,21 +320,26 @@ class _DropdownMenuState extends State<DropdownMenu>
             _hide(_activeIndex);
           }
           break;
+        case DropdownMenuShowHideSwitchStyle.directHideDirectShow:
+          {
+            _dropdownAnimations[_activeIndex].value = 0.0;
+          }
+          break;
         case DropdownMenuShowHideSwitchStyle
             .animationShowUntilAnimationHideComplete:
           {
             return _hide(_activeIndex).whenComplete(() {
-              return _handleShow(index);
+              return _handleShow(index,true);
             });
           }
           break;
       }
     }
 
-    return _handleShow(index);
+    return _handleShow(index,true);
   }
 
-  TickerFuture _handleShow(int index) {
+  TickerFuture _handleShow(int index,bool animation) {
     _activeIndex = index;
 
     setState(() {
