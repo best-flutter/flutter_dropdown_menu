@@ -5,6 +5,9 @@
     * Fix index change bug when switchStyle=DropdownMenuShowHideSwitchStyle.directHideAnimationShow
     * Add index change swith animation style : DropdownMenuShowHideSwitchStyle.directHideDirectShow
 
+## [1.1.0] - [2018/05/27]
+    * Add fix-head DorpdownMenu
+    * Add scrollview DropdownMenu
 
 
 

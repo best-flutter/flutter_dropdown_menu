@@ -5,10 +5,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-abstract class _DropdownMenuControllerListener {
-  Future<Null> onShow(int index);
-  Future<Null> onHide();
-}
+import 'drapdown_common.dart';
+
+export 'package:dropdown_menu/drapdown_common.dart';
 
 enum DropdownMenuShowHideSwitchStyle {
   /// the showing menu will direct hide without animation
@@ -24,46 +23,31 @@ enum DropdownMenuShowHideSwitchStyle {
   animationShowUntilAnimationHideComplete,
 }
 
-class DropdownMenuController {
-  _DropdownMenuControllerListener _listener;
-
-  void _setListener(_DropdownMenuControllerListener listener) {
-    _listener = listener;
-  }
-
-  Future<Null> show(int index) {
-    return _listener.onShow(index);
-  }
-
-  Future<Null> hide() {
-    return _listener.onHide();
-  }
-}
-
-class DropdownMenu extends StatefulWidget {
-  final Widget child;
-
-  final DropdownMenuController controller;
-
+class DropdownMenu extends DropdownWidget {
   /// menus whant to show
-  /// the elements of the menus must be [SizedBox] or [DropdownMenuBuilder]
-  final List<dynamic> menus;
+  final List<DropdownMenuBuilder> menus;
 
   final Duration hideDuration;
   final Duration showDuration;
   final Curve showCurve;
   final Curve hideCurve;
 
+  final VoidCallback onHide;
+
   /// The style when one menu hide and another menu show ,
   /// see [DropdownMenuShowHideSwitchStyle]
   final DropdownMenuShowHideSwitchStyle switchStyle;
 
+  final double maxMenuHeight;
+
   DropdownMenu(
-      {@required this.child,
-      @required this.controller,
-      @required this.menus,
+      {@required this.menus,
+      DropdownMenuController controller,
       Duration hideDuration,
       Duration showDuration,
+      this.onHide,
+      Key key,
+      this.maxMenuHeight,
       Curve hideCurve,
       this.switchStyle: DropdownMenuShowHideSwitchStyle
           .animationShowUntilAnimationHideComplete,
@@ -71,38 +55,15 @@ class DropdownMenu extends StatefulWidget {
       : hideDuration = hideDuration ?? new Duration(milliseconds: 150),
         showDuration = showDuration ?? new Duration(milliseconds: 300),
         showCurve = showCurve ?? Curves.fastOutSlowIn,
-        hideCurve = hideCurve ?? Curves.fastOutSlowIn {
-    assert(controller != null);
+        hideCurve = hideCurve ?? Curves.fastOutSlowIn,
+        super(key: key, controller: controller) {
     assert(menus != null);
-    assert(child != null);
-
-    for (int i = 0, c = menus.length; i < c; ++i) {
-      if (menus[i] is SizedBox) {
-        assert((menus[i] as SizedBox).height != null);
-        continue;
-      }
-      if (menus[i] is DropdownMenuBuilder) {
-        continue;
-      }
-
-      throw new Exception(
-          "The elements of the menus must be [SizedBox],or [DropdownMenuBuilder]");
-    }
   }
 
   @override
-  State<StatefulWidget> createState() {
+  DropdownState<DropdownMenu> createState() {
     return new _DropdownMenuState();
   }
-}
-
-class DropdownMenuBuilder {
-  final WidgetBuilder builder;
-  final double height;
-
-  DropdownMenuBuilder({@required this.builder, @required this.height})
-      : assert(builder != null),
-        assert(height != null && height > 0);
 }
 
 class _DropdownAnimation {
@@ -137,11 +98,9 @@ class _DropdownAnimation {
   }
 }
 
-class _DropdownMenuState extends State<DropdownMenu>
-    with TickerProviderStateMixin
-    implements _DropdownMenuControllerListener {
+class _DropdownMenuState extends DropdownState<DropdownMenu>
+    with TickerProviderStateMixin {
   List<_DropdownAnimation> _dropdownAnimations;
-
   bool _show;
   List<int> _showing;
 
@@ -154,8 +113,10 @@ class _DropdownMenuState extends State<DropdownMenu>
     _dropdownAnimations = [];
     for (int i = 0, c = widget.menus.length; i < c; ++i) {
       _dropdownAnimations.add(new _DropdownAnimation(this));
-      _dropdownAnimations[i].height = _getHeight(widget.menus[i]);
     }
+
+    _updateHeights();
+
     _show = false;
 
     _fadeController = new AnimationController(vsync: this);
@@ -173,59 +134,40 @@ class _DropdownMenuState extends State<DropdownMenu>
       _dropdownAnimations[i].dispose();
     }
 
-    if (widget.controller != null) {
-      widget.controller._setListener(null);
-    }
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    if (widget.controller != null) {
-      widget.controller._setListener(this);
+  void _updateHeights() {
+    for (int i = 0, c = widget.menus.length; i < c; ++i) {
+      _dropdownAnimations[i].height =
+          _ensureHeight(_getHeight(widget.menus[i]));
     }
-    super.didChangeDependencies();
   }
 
   @override
   void didUpdateWidget(DropdownMenu oldWidget) {
-    if (widget.controller != oldWidget.controller) {
-      if (oldWidget.controller != null) {
-        oldWidget.controller._setListener(null);
-      }
-      if (widget.controller != null) {
-        widget.controller._setListener(this);
-      }
-    }
     //update state
 
-    for (int i = 0, c = widget.menus.length; i < c; ++i) {
-      _dropdownAnimations[i].height = _getHeight(widget.menus[i]);
-    }
+    _updateHeights();
 
     super.didUpdateWidget(oldWidget);
   }
 
-  Widget createMenu(BuildContext context, dynamic menu, int i) {
-    if (menu is Widget) {
-      return menu;
-    }
-
+  Widget createMenu(BuildContext context, DropdownMenuBuilder menu, int i) {
     DropdownMenuBuilder builder = menu as DropdownMenuBuilder;
 
     return new SizedBox(
-        height: builder.height,
+        height: _ensureHeight(builder.height),
         child: _showing.contains(i) ? builder.builder(context) : null);
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> list = [
-      widget.child,
-    ];
+    List<Widget> list = [];
+
+    print("build ${new DateTime.now()}");
 
     if (_show) {
-      assert(_activeIndex != null);
       list.add(
         new FadeTransition(
           opacity: _fadeAnimation,
@@ -258,12 +200,19 @@ class _DropdownMenuState extends State<DropdownMenu>
     );
   }
 
-  @override
-  TickerFuture onHide() {
+  TickerFuture onHide({bool dispatch: true}) {
     if (_activeIndex != null) {
       int index = _activeIndex;
       _activeIndex = null;
       TickerFuture future = _hide(index);
+      if (dispatch) {
+        if (controller != null) {
+          controller.hide();
+        }
+
+        //if (widget.onHide != null) widget.onHide();
+      }
+
       _fadeController.animateTo(0.0,
           duration: widget.hideDuration, curve: widget.hideCurve);
 
@@ -286,7 +235,6 @@ class _DropdownMenuState extends State<DropdownMenu>
 
   int _activeIndex;
 
-  @override
   Future<Null> onShow(int index) {
     //哪一个是要展示的
 
@@ -329,17 +277,17 @@ class _DropdownMenuState extends State<DropdownMenu>
             .animationShowUntilAnimationHideComplete:
           {
             return _hide(_activeIndex).whenComplete(() {
-              return _handleShow(index,true);
+              return _handleShow(index, true);
             });
           }
           break;
       }
     }
 
-    return _handleShow(index,true);
+    return _handleShow(index, true);
   }
 
-  TickerFuture _handleShow(int index,bool animation) {
+  TickerFuture _handleShow(int index, bool animation) {
     _activeIndex = index;
 
     setState(() {
@@ -354,13 +302,35 @@ class _DropdownMenuState extends State<DropdownMenu>
   }
 
   double _getHeight(dynamic menu) {
-    if (menu is SizedBox) {
-      SizedBox sizedBox = menu;
-      assert(sizedBox.height != null);
-      return sizedBox.height;
-    }
-
     DropdownMenuBuilder builder = menu as DropdownMenuBuilder;
     return builder.height;
+  }
+
+  double _ensureHeight(double height) {
+    final double maxMenuHeight = widget.maxMenuHeight;
+    assert(height != null || maxMenuHeight != null,
+        "DropdownMenu.maxMenuHeight and DropdownMenuBuilder.height must not both null");
+    if (maxMenuHeight != null) {
+      if (height == null) return maxMenuHeight;
+      return height > maxMenuHeight ? maxMenuHeight : height;
+    }
+    return height;
+  }
+
+  @override
+  void onEvent(DropdownEvent event) {
+    switch (event) {
+      case DropdownEvent.SELECT:
+      case DropdownEvent.HIDE:
+        {
+          onHide(dispatch: false);
+        }
+        break;
+      case DropdownEvent.ACTIVE:
+        {
+          onShow(controller.menuIndex);
+        }
+        break;
+    }
   }
 }
