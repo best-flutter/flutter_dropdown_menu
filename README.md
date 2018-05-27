@@ -20,5 +20,6 @@ dropdown_menu : ^1.1.0
 
 ## Examples
 
+>see[main.dart](https://github.com/jzoom/flutter_dropdown_menu/blob/master/example/lib/main.dart)
 
 
