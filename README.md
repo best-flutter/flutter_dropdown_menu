@@ -6,9 +6,9 @@ A dropdown menu for Flutter.
 
 ![showcase](https://github.com/jzoom/images/raw/master/dropdown_menu.gif)
 ****
-![showcase](https://github.com/jzoom/images/raw/master/dropdown_menu_1.gif)
+![showcase](https://github.com/jzoom/images/raw/master/dropdown_menu1.gif)
 
-![showcase](https://github.com/jzoom/images/raw/master/dropdown_menu_2.gif)
+![showcase](https://github.com/jzoom/images/raw/master/dropdown_menu2.gif)
 
 ## Installion
 
