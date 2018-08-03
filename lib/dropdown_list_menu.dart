@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:dropdown_menu/drapdown_common.dart';
@@ -195,26 +196,33 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
   @override
   Widget build(BuildContext context) {
     return new Row(
-      children: <Widget>[
-        new Expanded(
-            flex: widget.flex,
-            child: new Container(
-              child: new ListView.builder(
-                itemBuilder: buildItem,
-                itemExtent: widget.itemExtent,
-                itemCount: this._data == null ? 0 : this._data.length,
-              ),
-              color: widget.background,
-            )),
-        new Expanded(
-            flex: widget.subFlex,
-            child: new ListView.builder(
-              itemBuilder: buildSubItem,
-              itemExtent: widget.itemExtent,
-              itemCount: this._subData == null ? 0 : this._subData.length,
-            ))
-      ],
-    );
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          new Expanded(
+              flex: widget.flex,
+              child: new Container(
+                child: new ListView.builder(
+                  itemExtent: widget.itemExtent,
+                  itemBuilder: buildItem,
+                  itemCount: this._data == null ? 0 : this._data.length,
+                ),
+                color: widget.background,
+              )),
+          new Expanded(
+              flex: widget.subFlex,
+              child: new Container(
+                color: widget.subBackground,
+                child: new CustomScrollView(
+                  slivers: <Widget>[
+                    new SliverList(
+                        delegate: new SliverChildBuilderDelegate( buildSubItem,childCount: this._subData == null ? 0 : this._subData.length,))
+                  ],
+
+
+                ),
+              ))
+        ],
+      );
   }
 
   @override

@@ -143,6 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
               selectedIndex: 0,
               subSelectedIndex: 0,
               itemExtent: 45.0,
+              background: Colors.red,
+              subBackground: Colors.blueAccent,
               itemBuilder: (BuildContext context, dynamic data, bool selected) {
                 if (!selected) {
                   return new DecoratedBox(
@@ -183,25 +185,29 @@ class _MyHomePageState extends State<MyHomePage> {
                     ? Theme.of(context).primaryColor
                     : Theme.of(context).textTheme.body1.color;
 
-                return new Row(
-                  children: <Widget>[
-                    new Text(
-                      data['title'],
-                      style: new TextStyle(color: color),
-                    ),
-                    new Expanded(
-                        child: new Align(
-                            alignment: Alignment.centerRight,
-                            child: new Text(data['count'].toString())))
-                  ],
+                return new SizedBox(
+                  height: 45.0,
+                  child: new Row(
+                    children: <Widget>[
+                      new Text(
+                        data['title'],
+                        style: new TextStyle(color: color),
+                      ),
+                      new Expanded(
+                          child: new Align(
+                              alignment: Alignment.centerRight,
+                              child: new Text(data['count'].toString())))
+                    ],
+                  ),
                 );
               },
               getSubData: (dynamic data) {
                 return data['children'];
               },
               data: FOODS,
+
             );
-          })
+          },height: 450.0)
         ]);
   }
 

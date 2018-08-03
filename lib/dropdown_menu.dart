@@ -1,9 +1,10 @@
 library flutter_dropdown_menu;
 
 import 'dart:async';
-
+import 'dart:ui' as ui show Image, ImageFilter;
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
+
+import 'package:flutter/foundation.dart';
 
 import 'drapdown_common.dart';
 
@@ -31,6 +32,9 @@ class DropdownMenu extends DropdownWidget {
   final Duration showDuration;
   final Curve showCurve;
   final Curve hideCurve;
+
+  /// if set , background is rendered with ImageFilter.blur
+  final double blur;
 
   final VoidCallback onHide;
 
@@ -98,6 +102,19 @@ class _DropdownAnimation {
   }
 }
 
+class SizeClipper extends CustomClipper<Rect>{
+  @override
+  Rect getClip(Size size) {
+    return new Rect.fromLTWH(0.0, 0.0, size.width, size.height);
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Rect> oldClipper) {
+    return false;
+  }
+
+}
+
 class _DropdownMenuState extends DropdownState<DropdownMenu>
     with TickerProviderStateMixin {
   List<_DropdownAnimation> _dropdownAnimations;
@@ -156,9 +173,12 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
   Widget createMenu(BuildContext context, DropdownMenuBuilder menu, int i) {
     DropdownMenuBuilder builder = menu as DropdownMenuBuilder;
 
-    return new SizedBox(
-        height: _ensureHeight(builder.height),
-        child: _showing.contains(i) ? builder.builder(context) : null);
+    return new ClipRect(
+      clipper: new SizeClipper(),
+      child: new SizedBox(
+          height: _ensureHeight(builder.height),
+          child: _showing.contains(i) ? builder.builder(context) : null),
+    );
   }
 
   @override
@@ -173,9 +193,9 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
           opacity: _fadeAnimation,
           child: new GestureDetector(
               onTap: onHide,
-              child: new Container(
+              child:  new Container(
                 color: Colors.black26,
-              )),
+              )) ,
         ),
       );
     }
@@ -303,6 +323,7 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
 
   double _getHeight(dynamic menu) {
     DropdownMenuBuilder builder = menu as DropdownMenuBuilder;
+
     return builder.height;
   }
 
