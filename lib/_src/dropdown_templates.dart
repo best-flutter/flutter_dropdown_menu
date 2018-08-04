@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:flutter/material.dart';
 
-import 'dropdown_header.dart';
+import 'package:dropdown_menu/_src/dropdown_header.dart';
 
 Widget buildCheckItem(BuildContext context, dynamic data, bool selected) {
   return new Padding(

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 
-import 'package:dropdown_menu/drapdown_common.dart';
+import 'package:dropdown_menu/_src/drapdown_common.dart';
 
 typedef void DropdownMenuHeadTapCallback(int index);
 

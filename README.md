@@ -10,13 +10,20 @@ A dropdown menu for Flutter.
 
 ![showcase](https://github.com/jzoom/images/raw/master/dropdown_menu2.gif)
 
+
+## Table of contents
+
+
 ## Installion
 
 ```
-
-dropdown_menu : ^1.1.0
-
+dropdown_menu: ^1.1.0
 ```
+
+## Build simple list menu
+## Build tree menu
+## Build custom menu
+
 
 ## Examples
 

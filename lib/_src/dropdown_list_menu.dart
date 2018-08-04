@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:dropdown_menu/drapdown_common.dart';
+import 'package:dropdown_menu/_src/drapdown_common.dart';
 
 typedef Widget MenuItemBuilder<T>(BuildContext context, T data, bool selected);
 typedef void MenuItemOnTap<T>(T data, int index);
@@ -36,12 +36,6 @@ class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }
-
   Widget buildItem(BuildContext context, int index) {
     final List<T> list = widget.data;
 
@@ -53,10 +47,8 @@ class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
         setState(() {
           _selectedIndex = index;
         });
-
         assert(controller != null);
         controller.select(data, index: index);
-        // if (onTap != null) onTap(data, index);
       },
     );
   }
@@ -84,23 +76,55 @@ class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
   }
 }
 
+/// This widget is just like this:
+/// ----------------|---------------------
+/// MainItem1       |SubItem1
+/// MainItem2       |SubItem2
+/// MainItem3       |SubItem3
+/// ----------------|---------------------
+/// When you tap "MainItem1", the sub list of this widget will
+/// 1. call `getSubData(widget.data[0])`, this will return a list of data for sub list
+/// 2. Refresh the sub list of the widget by using the list above.
+///
+///
 class DropdownTreeMenu<T, E> extends DropdownWidget {
+  /// data from this widget
   final List<T> data;
+
+  /// selected index of main list
   final int selectedIndex;
+
+  /// item builder for main list
   final MenuItemBuilder<T> itemBuilder;
 
+  //selected index of sub list
   final int subSelectedIndex;
+
+  /// A function to build right item of the tree
   final MenuItemBuilder<E> subItemBuilder;
 
+  /// A callback to get sub list from left list data, eg.
+  /// When you set List<MyData> to left,
+  /// a callback (MyData data)=>data.children; must be provided
   final GetSubData<T, E> getSubData;
 
+  /// `itemExtent` of main list
   final double itemExtent;
 
+  /// `itemExtent` of sub list
+  final double subItemExtent;
+
+  /// background for main list
   final Color background;
 
+  /// background for sub list
   final Color subBackground;
 
+  /// flex for main list
   final int flex;
+
+  /// flex for sub list,
+  /// if `subFlex`==2 and `flex`==1,then sub list will be 2 times larger than main list
   final int subFlex;
 
   DropdownTreeMenu({
@@ -108,6 +132,7 @@ class DropdownTreeMenu<T, E> extends DropdownWidget {
     double itemExtent,
     this.selectedIndex,
     this.itemBuilder,
+    this.subItemExtent,
     this.subItemBuilder,
     this.getSubData,
     this.background: const Color(0xfffafafa),
@@ -196,33 +221,35 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
   @override
   Widget build(BuildContext context) {
     return new Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new Expanded(
-              flex: widget.flex,
-              child: new Container(
-                child: new ListView.builder(
-                  itemExtent: widget.itemExtent,
-                  itemBuilder: buildItem,
-                  itemCount: this._data == null ? 0 : this._data.length,
-                ),
-                color: widget.background,
-              )),
-          new Expanded(
-              flex: widget.subFlex,
-              child: new Container(
-                color: widget.subBackground,
-                child: new CustomScrollView(
-                  slivers: <Widget>[
-                    new SliverList(
-                        delegate: new SliverChildBuilderDelegate( buildSubItem,childCount: this._subData == null ? 0 : this._subData.length,))
-                  ],
-
-
-                ),
-              ))
-        ],
-      );
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        new Expanded(
+            flex: widget.flex,
+            child: new Container(
+              child: new ListView.builder(
+                itemExtent: widget.itemExtent,
+                itemBuilder: buildItem,
+                itemCount: this._data == null ? 0 : this._data.length,
+              ),
+              color: widget.background,
+            )),
+        new Expanded(
+            flex: widget.subFlex,
+            child: new Container(
+              color: widget.subBackground,
+              child: new CustomScrollView(
+                slivers: <Widget>[
+                  new SliverList(
+                      delegate: new SliverChildBuilderDelegate(
+                    buildSubItem,
+                    childCount:
+                        this._subData == null ? 0 : this._subData.length,
+                  ))
+                ],
+              ),
+            ))
+      ],
+    );
   }
 
   @override
