@@ -3,11 +3,8 @@ library flutter_dropdown_menu;
 import 'dart:async';
 import 'dart:ui' as ui show Image, ImageFilter;
 import 'package:flutter/material.dart';
-
 import 'package:flutter/foundation.dart';
-
 import 'drapdown_common.dart';
-
 export 'package:dropdown_menu/drapdown_common.dart';
 
 enum DropdownMenuShowHideSwitchStyle {
@@ -50,6 +47,7 @@ class DropdownMenu extends DropdownWidget {
       Duration hideDuration,
       Duration showDuration,
       this.onHide,
+        this.blur,
       Key key,
       this.maxMenuHeight,
       Curve hideCurve,
@@ -174,7 +172,6 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
     DropdownMenuBuilder builder = menu as DropdownMenuBuilder;
 
     return new ClipRect(
-      clipper: new SizeClipper(),
       child: new SizedBox(
           height: _ensureHeight(builder.height),
           child: _showing.contains(i) ? builder.builder(context) : null),

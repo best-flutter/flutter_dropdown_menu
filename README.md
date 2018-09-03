@@ -18,8 +18,18 @@ dropdown_menu : ^1.1.0
 
 ```
 
+
+# How to use
+
+```
+
+
+```
+
+
 ## Examples
 
 >see[main.dart](https://github.com/jzoom/flutter_dropdown_menu/blob/master/example/lib/main.dart)
+
 
 
