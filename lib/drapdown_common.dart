@@ -1,5 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 enum DropdownEvent {
   // the menu will hide
@@ -158,14 +158,16 @@ abstract class DropdownState<T extends DropdownWidget> extends State<T> {
 
   @override
   void didChangeDependencies() {
-    if (widget.controller == null) {
-      controller = DefaultDropdownMenuController.of(context);
-    } else {
-      controller = widget.controller;
-    }
+    if (controller == null) {
+      if (widget.controller == null) {
+        controller = DefaultDropdownMenuController.of(context);
+      } else {
+        controller = widget.controller;
+      }
 
-    if (controller != null) {
-      controller.addListener(_onController);
+      if (controller != null) {
+        controller.addListener(_onController);
+      }
     }
     super.didChangeDependencies();
   }
