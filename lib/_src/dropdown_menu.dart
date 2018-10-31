@@ -191,7 +191,7 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
   Widget build(BuildContext context) {
     List<Widget> list = [];
 
-    print("build ${new DateTime.now()}");
+    // print("build ${new DateTime.now()}");
 
     if (_show) {
       list.add(
