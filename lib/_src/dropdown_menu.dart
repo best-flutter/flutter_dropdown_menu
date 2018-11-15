@@ -258,7 +258,7 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
 
   int _activeIndex;
 
-  TickerFuture onShow(int index) {
+  Future<void> onShow(int index) {
     //哪一个是要展示的
 
     assert(index >= 0 && index < _dropdownAnimations.length);
