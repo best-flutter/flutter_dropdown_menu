@@ -143,6 +143,7 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
     for (int i = 0, c = _dropdownAnimations.length; i < c; ++i) {
       _dropdownAnimations[i].dispose();
     }
+    _fadeController.dispose();
 
     super.dispose();
   }
