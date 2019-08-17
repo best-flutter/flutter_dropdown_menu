@@ -145,11 +145,11 @@ class DropdownTreeMenu<T, E> extends DropdownWidget {
 
   @override
   DropdownState<DropdownWidget> createState() {
-    return new _TreeMenuList();
+    return new _TreeMenuList<T, E>();
   }
 }
 
-class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
+class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu<T, E>> {
   int _subSelectedIndex;
   int _selectedIndex;
 
