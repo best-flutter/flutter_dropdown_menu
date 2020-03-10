@@ -18,6 +18,11 @@ class DropdownHeader extends DropdownWidget {
   final List<dynamic> titles;
   final int activeIndex;
   final DropdownMenuHeadTapCallback onTap;
+  final int maxLines;
+
+  final TextOverflow overflow;
+
+  final bool showLeftLine;
 
   /// height of menu
   final double height;
@@ -32,6 +37,9 @@ class DropdownHeader extends DropdownWidget {
       this.onTap,
       Key key,
       this.height: 46.0,
+      this.maxLines: 1,
+      this.overflow: TextOverflow.ellipsis,
+      this.showLeftLine: true,
       GetItemLabel getItemLabel})
       : getItemLabel = getItemLabel ?? defaultGetItemLabel,
         assert(titles != null && titles.length > 0),
@@ -50,28 +58,41 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
     final Color unselectedColor = Theme.of(context).unselectedWidgetColor;
     final GetItemLabel getItemLabel = widget.getItemLabel;
 
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: new Padding(
-          padding: new EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
-          child: new DecoratedBox(
-              decoration: new BoxDecoration(
-                  border: new Border(left: Divider.createBorderSide(context))),
-              child: new Center(
-                  child: new Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                    new Text(
-                      getItemLabel(title),
-                      style: new TextStyle(
-                        color: selected ? primaryColor : unselectedColor,
-                      ),
-                    ),
-                    new Icon(
-                      selected ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+              border: Border(
+                  left: widget.showLeftLine
+                      ? Divider.createBorderSide(context)
+                      : BorderSide.none)),
+          child: Center(
+            child:
+
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Flexible(
+                  child: Text(
+                    getItemLabel(title),
+                    style: new TextStyle(
                       color: selected ? primaryColor : unselectedColor,
-                    )
-                  ])))),
+                    ),
+                    maxLines: widget.maxLines,
+                    overflow: widget.overflow,
+                  ),
+                ),
+                Icon(
+                  selected ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                  color: selected ? primaryColor : unselectedColor,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
       onTap: () {
         if (widget.onTap != null) {
           widget.onTap(index);
