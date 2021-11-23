@@ -11,7 +11,7 @@ Widget buildCheckItem(BuildContext context, dynamic data, bool selected) {
         children: <Widget>[
            Expanded(
              child: Text(
-              defaultGetItemLabel(data),
+              defaultGetItemLabel(data)!,
               style: selected
                   ? new TextStyle(
                       fontSize: 14.0,

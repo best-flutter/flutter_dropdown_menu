@@ -7,17 +7,17 @@ import 'package:dropdown_menu/_src/drapdown_common.dart';
 
 typedef void DropdownMenuHeadTapCallback(int index);
 
-typedef String GetItemLabel(dynamic data);
+typedef String? GetItemLabel(dynamic data);
 
-String defaultGetItemLabel(dynamic data) {
+String? defaultGetItemLabel(dynamic data) {
   if (data is String) return data;
   return data["title"];
 }
 
 class DropdownHeader extends DropdownWidget {
   final List<dynamic> titles;
-  final int activeIndex;
-  final DropdownMenuHeadTapCallback onTap;
+  final int? activeIndex;
+  final DropdownMenuHeadTapCallback? onTap;
   final int maxLines;
 
   final TextOverflow overflow;
@@ -31,16 +31,16 @@ class DropdownHeader extends DropdownWidget {
   final GetItemLabel getItemLabel;
 
   DropdownHeader(
-      {@required this.titles,
+      {required this.titles,
       this.activeIndex,
-      DropdownMenuController controller,
+      DropdownMenuController? controller,
       this.onTap,
-      Key key,
+      Key? key,
       this.height: 46.0,
       this.maxLines: 1,
       this.overflow: TextOverflow.ellipsis,
       this.showLeftLine: true,
-      GetItemLabel getItemLabel})
+      GetItemLabel? getItemLabel})
       : getItemLabel = getItemLabel ?? defaultGetItemLabel,
         assert(titles != null && titles.length > 0),
         super(key: key, controller: controller);
@@ -76,7 +76,7 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
               children: <Widget>[
                 Flexible(
                   child: Text(
-                    getItemLabel(title),
+                    getItemLabel(title)!,
                     style: new TextStyle(
                       color: selected ? primaryColor : unselectedColor,
                     ),
@@ -95,18 +95,18 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
       ),
       onTap: () {
         if (widget.onTap != null) {
-          widget.onTap(index);
+          widget.onTap!(index);
 
           return;
         }
         if (controller != null) {
           if (_activeIndex == index) {
-            controller.hide();
+            controller!.hide();
             setState(() {
               _activeIndex = null;
             });
           } else {
-            controller.show(index);
+            controller!.show(index);
           }
         }
         //widget.onTap(index);
@@ -114,19 +114,19 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
     );
   }
 
-  int _activeIndex;
-  List<dynamic> _titles;
+  int? _activeIndex;
+  List<dynamic>? _titles;
 
   @override
   Widget build(BuildContext context) {
     List<Widget> list = [];
 
-    final int activeIndex = _activeIndex;
-    final List<dynamic> titles = _titles;
+    final int? activeIndex = _activeIndex;
+    final List<dynamic>? titles = _titles;
     final double height = widget.height;
 
     for (int i = 0, c = widget.titles.length; i < c; ++i) {
-      list.add(buildItem(context, titles[i], i == activeIndex, i));
+      list.add(buildItem(context, titles![i], i == activeIndex, i));
     }
 
     list = list.map((Widget widget) {
@@ -158,7 +158,7 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
   }
 
   @override
-  void onEvent(DropdownEvent event) {
+  void onEvent(DropdownEvent? event) {
     switch (event) {
       case DropdownEvent.SELECT:
         {
@@ -166,8 +166,8 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
 
           setState(() {
             _activeIndex = null;
-            String label = widget.getItemLabel(controller.data);
-            _titles[controller.menuIndex] = label;
+            String? label = widget.getItemLabel(controller!.data);
+            _titles![controller!.menuIndex!] = label;
           });
         }
         break;
@@ -181,9 +181,9 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
         break;
       case DropdownEvent.ACTIVE:
         {
-          if (_activeIndex == controller.menuIndex) return;
+          if (_activeIndex == controller!.menuIndex) return;
           setState(() {
-            _activeIndex = controller.menuIndex;
+            _activeIndex = controller!.menuIndex;
           });
         }
         break;

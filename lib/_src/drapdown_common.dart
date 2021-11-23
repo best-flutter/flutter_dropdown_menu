@@ -14,19 +14,19 @@ enum DropdownEvent {
 
 class DropdownMenuController extends ChangeNotifier {
   //user interaction event name
-  DropdownEvent event;
+  DropdownEvent? event;
 
   // whitch menu index
-  int menuIndex;
+  int? menuIndex;
 
   /// selected data
   dynamic data;
 
   /// item index in list [TreeMenuList] or [MenuList] or your custom menu
-  int index;
+  int? index;
 
   /// item index in sublist of [TreeMenuList]
-  int subIndex;
+  int? subIndex;
 
   void hide() {
     event = DropdownEvent.HIDE;
@@ -39,7 +39,7 @@ class DropdownMenuController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void select(dynamic data, {int index, int subIndex}) {
+  void select(dynamic data, {int? index, int? subIndex}) {
     event = DropdownEvent.SELECT;
     this.data = data;
     this.index = index;
@@ -49,21 +49,21 @@ class DropdownMenuController extends ChangeNotifier {
 }
 
 typedef DropdownMenuOnSelected(
-    {int menuIndex, int index, int subIndex, dynamic data});
+    {int? menuIndex, int? index, int? subIndex, dynamic data});
 
 class DefaultDropdownMenuController extends StatefulWidget {
   const DefaultDropdownMenuController({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.onSelected,
   }) : super(key: key);
 
   final Widget child;
 
-  final DropdownMenuOnSelected onSelected;
+  final DropdownMenuOnSelected? onSelected;
 
-  static DropdownMenuController of(BuildContext context) {
-    final _DropdownMenuControllerScope scope =
+  static DropdownMenuController? of(BuildContext context) {
+    final _DropdownMenuControllerScope? scope =
         context.dependOnInheritedWidgetOfExactType(
             aspect: _DropdownMenuControllerScope);
     return scope?.controller;
@@ -77,26 +77,26 @@ class DefaultDropdownMenuController extends StatefulWidget {
 class _DefaultDropdownMenuControllerState
     extends State<DefaultDropdownMenuController>
     with SingleTickerProviderStateMixin {
-  DropdownMenuController _controller;
+  DropdownMenuController? _controller;
 
   @override
   void initState() {
     super.initState();
     _controller = new DropdownMenuController();
-    _controller.addListener(_onController);
+    _controller!.addListener(_onController);
   }
 
   void _onController() {
-    switch (_controller.event) {
+    switch (_controller!.event) {
       case DropdownEvent.SELECT:
         {
           //通知widget
           if (widget.onSelected == null) return;
-          widget.onSelected(
-              data: _controller.data,
-              menuIndex: _controller.menuIndex,
-              index: _controller.index,
-              subIndex: _controller.subIndex);
+          widget.onSelected!(
+              data: _controller!.data,
+              menuIndex: _controller!.menuIndex,
+              index: _controller!.index,
+              subIndex: _controller!.subIndex);
         }
         break;
       case DropdownEvent.ACTIVE:
@@ -108,8 +108,8 @@ class _DefaultDropdownMenuControllerState
 
   @override
   void dispose() {
-    _controller.removeListener(_onController);
-    _controller.dispose();
+    _controller!.removeListener(_onController);
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -125,11 +125,11 @@ class _DefaultDropdownMenuControllerState
 
 class _DropdownMenuControllerScope extends InheritedWidget {
   const _DropdownMenuControllerScope(
-      {Key key, this.controller, this.enabled, Widget child})
+      {Key? key, this.controller, this.enabled, required Widget child})
       : super(key: key, child: child);
 
-  final DropdownMenuController controller;
-  final bool enabled;
+  final DropdownMenuController? controller;
+  final bool? enabled;
 
   @override
   bool updateShouldNotify(_DropdownMenuControllerScope old) {
@@ -138,21 +138,21 @@ class _DropdownMenuControllerScope extends InheritedWidget {
 }
 
 abstract class DropdownWidget extends StatefulWidget {
-  final DropdownMenuController controller;
+  final DropdownMenuController? controller;
 
-  DropdownWidget({Key key, this.controller}) : super(key: key);
+  DropdownWidget({Key? key, this.controller}) : super(key: key);
 
   @override
   DropdownState<DropdownWidget> createState();
 }
 
 abstract class DropdownState<T extends DropdownWidget> extends State<T> {
-  DropdownMenuController controller;
+  DropdownMenuController? controller;
 
   @override
   void dispose() {
     if (controller != null) {
-      controller.removeListener(_onController);
+      controller!.removeListener(_onController);
     }
     super.dispose();
   }
@@ -167,7 +167,7 @@ abstract class DropdownState<T extends DropdownWidget> extends State<T> {
       }
 
       if (controller != null) {
-        controller.addListener(_onController);
+        controller!.addListener(_onController);
       }
     }
     super.didChangeDependencies();
@@ -177,27 +177,27 @@ abstract class DropdownState<T extends DropdownWidget> extends State<T> {
   void didUpdateWidget(T oldWidget) {
     if (widget.controller != null) {
       if (controller != null) {
-        controller.removeListener(_onController);
+        controller!.removeListener(_onController);
       }
       controller = widget.controller;
-      controller.addListener(_onController);
+      controller!.addListener(_onController);
     }
 
     super.didUpdateWidget(oldWidget);
   }
 
   void _onController() {
-    onEvent(controller.event);
+    onEvent(controller!.event);
   }
 
-  void onEvent(DropdownEvent event);
+  void onEvent(DropdownEvent? event);
 }
 
 class DropdownMenuBuilder {
   final WidgetBuilder builder;
-  final double height;
+  final double? height;
 
   //if height == null , use [DropdownMenu.maxMenuHeight]
-  DropdownMenuBuilder({@required this.builder, this.height})
+  DropdownMenuBuilder({required this.builder, this.height})
       : assert(builder != null);
 }
