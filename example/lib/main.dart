@@ -180,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       (BuildContext context, dynamic data, bool selected) {
                     Color color = selected
                         ? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.body1.color;
+                        : Theme.of(context).textTheme.bodyText1.color;
 
                     return new SizedBox(
                       height: 45.0,

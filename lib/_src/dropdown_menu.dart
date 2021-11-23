@@ -205,7 +205,7 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
 
     for (int i = 0, c = widget.menus.length; i < c; ++i) {
       list.add(new RelativePositionedTransition(
-          rect: _dropdownAnimations[i].rect as Animation<ui.Rect>,
+          rect: _dropdownAnimations[i].rect as Animation<Rect>,
           size: new Size(0.0, 0.0),
           child: new Align(
               alignment: Alignment.topCenter,
