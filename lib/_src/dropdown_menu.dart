@@ -65,20 +65,19 @@ class DropdownMenu extends DropdownWidget {
 }
 
 class _DropdownAnimation {
-  late Animation<Rect?> rect;
+  late Animation<Rect> rect;
   late AnimationController animationController;
-  late RectTween position;
+  late Tween<Rect> position;
 
   _DropdownAnimation(TickerProvider provider) {
     animationController = new AnimationController(vsync: provider);
   }
 
   set height(double value) {
-    position = new RectTween(
-      begin: new Rect.fromLTRB(0.0, -value, 0.0, 0.0),
-      end: new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0),
+    position = Tween<Rect>(
+      begin: Rect.fromLTRB(0.0, -value, 0.0, 0.0),
+      end: Rect.fromLTRB(0.0, 0.0, 0.0, 0.0),
     );
-
     rect = position.animate(animationController);
   }
 
@@ -90,7 +89,8 @@ class _DropdownAnimation {
     animationController.dispose();
   }
 
-  TickerFuture animateTo(double value, {Duration? duration, required Curve curve}) {
+  TickerFuture animateTo(double value,
+      {Duration? duration, required Curve curve}) {
     return animationController.animateTo(value,
         duration: duration, curve: curve);
   }
@@ -205,7 +205,7 @@ class _DropdownMenuState extends DropdownState<DropdownMenu>
 
     for (int i = 0, c = widget.menus.length; i < c; ++i) {
       list.add(new RelativePositionedTransition(
-          rect: _dropdownAnimations[i].rect as Animation<Rect>,
+          rect: _dropdownAnimations[i].rect,
           size: new Size(0.0, 0.0),
           child: new Align(
               alignment: Alignment.topCenter,
