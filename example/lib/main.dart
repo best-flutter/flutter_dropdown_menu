@@ -1,9 +1,7 @@
-import 'dart:async';
+// ignore_for_file: non_constant_identifier_names
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DropdownMenu;
 import 'package:dropdown_menu/dropdown_menu.dart';
-import 'dart:math' as math;
-import 'dart:io';
 import 'dart:convert';
 
 void main() => runApp(new MyApp());
@@ -112,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   DropdownMenu buildDropdownMenu() {
-    return new DropdownMenu(maxMenuHeight: kDropdownMenuItemHeight * 10,
+    return new DropdownMenu(
+        maxMenuHeight: kDropdownMenuItemHeight * 10,
         //  activeIndex: activeIndex,
         menus: [
           new DropdownMenuBuilder(
@@ -180,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       (BuildContext context, dynamic data, bool selected) {
                     Color color = selected
                         ? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.body1.color;
+                        : Theme.of(context).textTheme.bodyLarge.color;
 
                     return new SizedBox(
                       height: 45.0,
@@ -327,7 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
             {"name": "ScrollView", "icon": Icons.list}
           ]
               .map((dynamic data) => new BottomNavigationBarItem(
-                  title: new Text(data["name"]), icon: new Icon(data["icon"])))
+                  label: data["name"], icon: new Icon(data["icon"])))
               .toList()),
     );
   }
