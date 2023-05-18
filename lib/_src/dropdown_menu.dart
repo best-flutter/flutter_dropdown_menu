@@ -63,16 +63,16 @@ class DropdownMenu extends DropdownWidget {
 }
 
 class DropdownAnimation {
-  late Animation<Rect> rect;
+  late Animation<Rect?> rect;
   late AnimationController animationController;
-  late Tween<Rect> position;
+  late RectTween position;
 
   DropdownAnimation(TickerProvider provider) {
     animationController = AnimationController(vsync: provider);
   }
 
   set height(double value) {
-    position = Tween<Rect>(
+    position = RectTween(
       begin: Rect.fromLTRB(0.0, -value, 0.0, 0.0),
       end: const Rect.fromLTRB(0.0, 0.0, 0.0, 0.0),
     );
