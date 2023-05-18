@@ -186,23 +186,20 @@
 //  });
 //}
 
-
 import 'package:flutter/material.dart';
 
-class FixMenu extends StatefulWidget{
+class FixMenu extends StatefulWidget {
+  const FixMenu({super.key});
+
   @override
   State<StatefulWidget> createState() {
-    return new _FixMenuState();
+    return FixMenuState();
   }
-
 }
 
-class _FixMenuState extends State<FixMenu>{
+class FixMenuState extends State<FixMenu> {
   @override
   Widget build(BuildContext context) {
-    return new Container(
-
-    );
+    return Container();
   }
-
 }

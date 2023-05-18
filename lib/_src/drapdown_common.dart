@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:flutter/widgets.dart';
 
 enum DropdownEvent {
@@ -47,7 +49,7 @@ class DropdownMenuController extends ChangeNotifier {
   }
 }
 
-typedef DropdownMenuOnSelected(
+typedef DropdownMenuOnSelected = Function(
     {int? menuIndex, int? index, int? subIndex, dynamic data});
 
 class DefaultDropdownMenuController extends StatefulWidget {
@@ -69,11 +71,11 @@ class DefaultDropdownMenuController extends StatefulWidget {
   }
 
   @override
-  _DefaultDropdownMenuControllerState createState() =>
-      new _DefaultDropdownMenuControllerState();
+  DefaultDropdownMenuControllerState createState() =>
+      DefaultDropdownMenuControllerState();
 }
 
-class _DefaultDropdownMenuControllerState
+class DefaultDropdownMenuControllerState
     extends State<DefaultDropdownMenuController>
     with SingleTickerProviderStateMixin {
   DropdownMenuController? _controller;
@@ -81,7 +83,7 @@ class _DefaultDropdownMenuControllerState
   @override
   void initState() {
     super.initState();
-    _controller = new DropdownMenuController();
+    _controller = DropdownMenuController();
     _controller!.addListener(_onController);
   }
 
@@ -116,7 +118,7 @@ class _DefaultDropdownMenuControllerState
 
   @override
   Widget build(BuildContext context) {
-    return new _DropdownMenuControllerScope(
+    return _DropdownMenuControllerScope(
       controller: _controller,
       enabled: TickerMode.of(context),
       child: widget.child,
@@ -141,7 +143,7 @@ class _DropdownMenuControllerScope extends InheritedWidget {
 abstract class DropdownWidget extends StatefulWidget {
   final DropdownMenuController? controller;
 
-  DropdownWidget({Key? key, this.controller}) : super(key: key);
+  const DropdownWidget({Key? key, this.controller}) : super(key: key);
 
   @override
   DropdownState<DropdownWidget> createState();

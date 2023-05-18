@@ -1,20 +1,17 @@
-
 import 'package:flutter/material.dart';
 
-class BasicMenu extends StatefulWidget{
+class BasicMenu extends StatefulWidget {
+  const BasicMenu({super.key});
+
   @override
   State<StatefulWidget> createState() {
-    return new _BasicMenuState();
+    return _BasicMenuState();
   }
-
 }
 
-class _BasicMenuState extends State<BasicMenu>{
+class _BasicMenuState extends State<BasicMenu> {
   @override
   Widget build(BuildContext context) {
-    return new Container(
-
-    );
+    return Container();
   }
-
 }

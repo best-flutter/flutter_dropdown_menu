@@ -3,9 +3,10 @@ import 'package:flutter/widgets.dart';
 
 import 'package:dropdown_menu/_src/drapdown_common.dart';
 
-typedef Widget MenuItemBuilder<T>(BuildContext context, T? data, bool selected);
-typedef void MenuItemOnTap<T>(T data, int index);
-typedef List<E> GetSubData<T, E>(T data);
+typedef MenuItemBuilder<T> = Widget Function(
+    BuildContext context, T? data, bool selected);
+typedef MenuItemOnTap<T> = void Function(T data, int index);
+typedef GetSubData<T, E> = List<E> Function(T data);
 
 const double kDropdownMenuItemHeight = 45.0;
 
@@ -16,18 +17,19 @@ class DropdownListMenu<T> extends DropdownWidget {
   final double itemExtent;
 
   DropdownListMenu(
-      {this.data,
+      {super.key,
+      this.data,
       this.selectedIndex,
       this.itemBuilder,
       this.itemExtent = kDropdownMenuItemHeight});
 
   @override
   DropdownState<DropdownWidget> createState() {
-    return new _MenuListState<T>();
+    return MenuListState<T>();
   }
 }
 
-class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
+class MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
   int? _selectedIndex;
 
   @override
@@ -40,7 +42,7 @@ class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
     final List<T> list = widget.data!;
 
     final T data = list[index];
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
       child: widget.itemBuilder!(context, data, index == _selectedIndex),
       onTap: () {
@@ -55,7 +57,7 @@ class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return new ListView.builder(
+    return ListView.builder(
       itemExtent: widget.itemExtent,
       itemBuilder: buildItem,
       itemCount: widget.data!.length,
@@ -130,6 +132,7 @@ class DropdownTreeMenu<T, E> extends DropdownWidget {
   final int subFlex;
 
   DropdownTreeMenu({
+    super.key,
     required this.data,
     double? itemExtent,
     this.selectedIndex,
@@ -186,7 +189,7 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu<T, E>> {
   }
 
   Widget buildSubItem(BuildContext context, int index) {
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
       child: widget.subItemBuilder!(context, _subData![index],
           _activeIndex == _selectedIndex && index == _subSelectedIndex),
@@ -205,7 +208,7 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu<T, E>> {
   Widget buildItem(BuildContext context, int index) {
     final List<T> list = widget.data;
     final T data = list[index];
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
       child: widget.itemBuilder!(context, data, index == _activeIndex),
       onTap: () {
@@ -221,27 +224,27 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu<T, E>> {
 
   @override
   Widget build(BuildContext context) {
-    return new Row(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        new Expanded(
+        Expanded(
             flex: widget.flex,
-            child: new Container(
-              child: new ListView.builder(
+            child: Container(
+              color: widget.background,
+              child: ListView.builder(
                 itemExtent: widget.itemExtent,
                 itemBuilder: buildItem,
                 itemCount: this._data == null ? 0 : this._data!.length,
               ),
-              color: widget.background,
             )),
-        new Expanded(
+        Expanded(
             flex: widget.subFlex,
-            child: new Container(
+            child: Container(
               color: widget.subBackground,
-              child: new CustomScrollView(
+              child: CustomScrollView(
                 slivers: <Widget>[
-                  new SliverList(
-                      delegate: new SliverChildBuilderDelegate(
+                  SliverList(
+                      delegate: SliverChildBuilderDelegate(
                     buildSubItem,
                     childCount:
                         this._subData == null ? 0 : this._subData!.length,

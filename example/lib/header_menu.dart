@@ -1,20 +1,17 @@
-
 import 'package:flutter/material.dart';
 
-class HeaderMenu extends StatefulWidget{
+class HeaderMenu extends StatefulWidget {
+  const HeaderMenu({super.key});
+
   @override
   State<StatefulWidget> createState() {
-    return new _HeaderMenuState();
+    return HeaderMenuState();
   }
-
 }
 
-class _HeaderMenuState extends State<HeaderMenu>{
+class HeaderMenuState extends State<HeaderMenu> {
   @override
   Widget build(BuildContext context) {
-    return new Container(
-
-    );
+    return Container();
   }
-
 }

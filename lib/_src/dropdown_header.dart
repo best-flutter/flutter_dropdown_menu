@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:dropdown_menu/_src/drapdown_common.dart';
 
-typedef void DropdownMenuHeadTapCallback(int index);
+typedef DropdownMenuHeadTapCallback = void Function(int index);
 
-typedef String? GetItemLabel(dynamic data);
+typedef GetItemLabel = String? Function(dynamic data);
 
 String? defaultGetItemLabel(dynamic data) {
   if (data is String) return data;
@@ -39,12 +39,12 @@ class DropdownHeader extends DropdownWidget {
       this.showLeftLine = true,
       GetItemLabel? getItemLabel})
       : getItemLabel = getItemLabel ?? defaultGetItemLabel,
-        assert(titles.length > 0),
+        assert(titles.isNotEmpty),
         super(key: key, controller: controller);
 
   @override
   DropdownState<DropdownWidget> createState() {
-    return new _DropdownHeaderState();
+    return _DropdownHeaderState();
   }
 }
 
@@ -58,7 +58,7 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
+        padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
         child: DecoratedBox(
           decoration: BoxDecoration(
               border: Border(
@@ -72,7 +72,7 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
                 Flexible(
                   child: Text(
                     getItemLabel(title)!,
-                    style: new TextStyle(
+                    style: TextStyle(
                       color: selected ? primaryColor : unselectedColor,
                     ),
                     maxLines: widget.maxLines,
@@ -125,24 +125,24 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
     }
 
     list = list.map((Widget widget) {
-      return new Expanded(
+      return Expanded(
         child: widget,
       );
     }).toList();
 
-    final Decoration decoration = new BoxDecoration(
-      border: new Border(
+    final Decoration decoration = BoxDecoration(
+      border: Border(
         bottom: Divider.createBorderSide(context),
       ),
     );
 
-    return new DecoratedBox(
+    return DecoratedBox(
       decoration: decoration,
-      child: new SizedBox(
-          child: new Row(
+      child: SizedBox(
+          height: height,
+          child: Row(
             children: list,
-          ),
-          height: height),
+          )),
     );
   }
 

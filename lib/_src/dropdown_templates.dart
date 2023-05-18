@@ -4,18 +4,18 @@ import 'package:dropdown_menu/_src/dropdown_header.dart';
 
 Widget buildCheckItem(BuildContext context, dynamic data, bool selected) {
   return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(10.0),
       child: Row(
         children: <Widget>[
           Expanded(
             child: Text(
               defaultGetItemLabel(data)!,
               style: selected
-                  ? new TextStyle(
+                  ? TextStyle(
                       fontSize: 14.0,
                       color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.w400)
-                  : new TextStyle(fontSize: 14.0),
+                  : const TextStyle(fontSize: 14.0),
             ),
           ),
           Align(
