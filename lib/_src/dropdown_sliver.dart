@@ -4,7 +4,7 @@ class DropdownSliverChildBuilderDelegate
     extends SliverPersistentHeaderDelegate {
   WidgetBuilder builder;
 
-  DropdownSliverChildBuilderDelegate({this.builder}) : assert(builder != null);
+  DropdownSliverChildBuilderDelegate({required this.builder});
 
   @override
   Widget build(

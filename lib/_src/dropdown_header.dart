@@ -1,23 +1,25 @@
-import 'package:flutter/widgets.dart';
-import 'package:flutter/foundation.dart';
-
 import 'package:flutter/material.dart';
 
 import 'package:dropdown_menu/_src/drapdown_common.dart';
 
-typedef void DropdownMenuHeadTapCallback(int index);
+typedef DropdownMenuHeadTapCallback = void Function(int index);
 
-typedef String GetItemLabel(dynamic data);
+typedef GetItemLabel = String? Function(dynamic data);
 
-String defaultGetItemLabel(dynamic data) {
+String? defaultGetItemLabel(dynamic data) {
   if (data is String) return data;
   return data["title"];
 }
 
 class DropdownHeader extends DropdownWidget {
   final List<dynamic> titles;
-  final int activeIndex;
-  final DropdownMenuHeadTapCallback onTap;
+  final int? activeIndex;
+  final DropdownMenuHeadTapCallback? onTap;
+  final int maxLines;
+
+  final TextOverflow overflow;
+
+  final bool showLeftLine;
 
   /// height of menu
   final double height;
@@ -26,20 +28,23 @@ class DropdownHeader extends DropdownWidget {
   final GetItemLabel getItemLabel;
 
   DropdownHeader(
-      {@required this.titles,
+      {required this.titles,
       this.activeIndex,
-      DropdownMenuController controller,
+      DropdownMenuController? controller,
       this.onTap,
-      Key key,
-      this.height: 46.0,
-      GetItemLabel getItemLabel})
+      Key? key,
+      this.height = 46.0,
+      this.maxLines = 1,
+      this.overflow = TextOverflow.ellipsis,
+      this.showLeftLine = true,
+      GetItemLabel? getItemLabel})
       : getItemLabel = getItemLabel ?? defaultGetItemLabel,
-        assert(titles != null && titles.length > 0),
+        assert(titles.isNotEmpty),
         super(key: key, controller: controller);
 
   @override
   DropdownState<DropdownWidget> createState() {
-    return new _DropdownHeaderState();
+    return _DropdownHeaderState();
   }
 }
 
@@ -50,42 +55,53 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
     final Color unselectedColor = Theme.of(context).unselectedWidgetColor;
     final GetItemLabel getItemLabel = widget.getItemLabel;
 
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: new Padding(
-          padding: new EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
-          child: new DecoratedBox(
-              decoration: new BoxDecoration(
-                  border: new Border(left: Divider.createBorderSide(context))),
-              child: new Center(
-                  child: new Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                    new Text(
-                      getItemLabel(title),
-                      style: new TextStyle(
-                        color: selected ? primaryColor : unselectedColor,
-                      ),
-                    ),
-                    new Icon(
-                      selected ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+              border: Border(
+                  left: widget.showLeftLine
+                      ? Divider.createBorderSide(context)
+                      : BorderSide.none)),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Flexible(
+                  child: Text(
+                    getItemLabel(title)!,
+                    style: TextStyle(
                       color: selected ? primaryColor : unselectedColor,
-                    )
-                  ])))),
+                    ),
+                    maxLines: widget.maxLines,
+                    overflow: widget.overflow,
+                  ),
+                ),
+                Icon(
+                  selected ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                  color: selected ? primaryColor : unselectedColor,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
       onTap: () {
         if (widget.onTap != null) {
-          widget.onTap(index);
+          widget.onTap!(index);
 
           return;
         }
         if (controller != null) {
           if (_activeIndex == index) {
-            controller.hide();
+            controller!.hide();
             setState(() {
               _activeIndex = null;
             });
           } else {
-            controller.show(index);
+            controller!.show(index);
           }
         }
         //widget.onTap(index);
@@ -93,40 +109,40 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
     );
   }
 
-  int _activeIndex;
-  List<dynamic> _titles;
+  int? _activeIndex;
+  List<dynamic>? _titles;
 
   @override
   Widget build(BuildContext context) {
     List<Widget> list = [];
 
-    final int activeIndex = _activeIndex;
-    final List<dynamic> titles = _titles;
+    final int? activeIndex = _activeIndex;
+    final List<dynamic>? titles = _titles;
     final double height = widget.height;
 
     for (int i = 0, c = widget.titles.length; i < c; ++i) {
-      list.add(buildItem(context, titles[i], i == activeIndex, i));
+      list.add(buildItem(context, titles![i], i == activeIndex, i));
     }
 
     list = list.map((Widget widget) {
-      return new Expanded(
+      return Expanded(
         child: widget,
       );
     }).toList();
 
-    final Decoration decoration = new BoxDecoration(
-      border: new Border(
+    final Decoration decoration = BoxDecoration(
+      border: Border(
         bottom: Divider.createBorderSide(context),
       ),
     );
 
-    return new DecoratedBox(
+    return DecoratedBox(
       decoration: decoration,
-      child: new SizedBox(
-          child: new Row(
+      child: SizedBox(
+          height: height,
+          child: Row(
             children: list,
-          ),
-          height: height),
+          )),
     );
   }
 
@@ -137,7 +153,7 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
   }
 
   @override
-  void onEvent(DropdownEvent event) {
+  void onEvent(DropdownEvent? event) {
     switch (event) {
       case DropdownEvent.SELECT:
         {
@@ -145,8 +161,8 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
 
           setState(() {
             _activeIndex = null;
-            String label = widget.getItemLabel(controller.data);
-            _titles[controller.menuIndex] = label;
+            String? label = widget.getItemLabel(controller!.data);
+            _titles![controller!.menuIndex!] = label;
           });
         }
         break;
@@ -160,11 +176,13 @@ class _DropdownHeaderState extends DropdownState<DropdownHeader> {
         break;
       case DropdownEvent.ACTIVE:
         {
-          if (_activeIndex == controller.menuIndex) return;
+          if (_activeIndex == controller!.menuIndex) return;
           setState(() {
-            _activeIndex = controller.menuIndex;
+            _activeIndex = controller!.menuIndex;
           });
         }
+        break;
+      default:
         break;
     }
   }

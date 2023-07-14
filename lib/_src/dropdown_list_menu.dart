@@ -3,32 +3,34 @@ import 'package:flutter/widgets.dart';
 
 import 'package:dropdown_menu/_src/drapdown_common.dart';
 
-typedef Widget MenuItemBuilder<T>(BuildContext context, T data, bool selected);
-typedef void MenuItemOnTap<T>(T data, int index);
-typedef List<E> GetSubData<T, E>(T data);
+typedef MenuItemBuilder<T> = Widget Function(
+    BuildContext context, T? data, bool selected);
+typedef MenuItemOnTap<T> = void Function(T data, int index);
+typedef GetSubData<T, E> = List<E> Function(T data);
 
 const double kDropdownMenuItemHeight = 45.0;
 
 class DropdownListMenu<T> extends DropdownWidget {
-  final List<T> data;
-  final int selectedIndex;
-  final MenuItemBuilder itemBuilder;
+  final List<T>? data;
+  final int? selectedIndex;
+  final MenuItemBuilder? itemBuilder;
   final double itemExtent;
 
   DropdownListMenu(
-      {this.data,
+      {super.key,
+      this.data,
       this.selectedIndex,
       this.itemBuilder,
-      this.itemExtent: kDropdownMenuItemHeight});
+      this.itemExtent = kDropdownMenuItemHeight});
 
   @override
   DropdownState<DropdownWidget> createState() {
-    return new _MenuListState<T>();
+    return MenuListState<T>();
   }
 }
 
-class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
-  int _selectedIndex;
+class MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
+  int? _selectedIndex;
 
   @override
   void initState() {
@@ -37,33 +39,33 @@ class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
   }
 
   Widget buildItem(BuildContext context, int index) {
-    final List<T> list = widget.data;
+    final List<T> list = widget.data!;
 
     final T data = list[index];
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: widget.itemBuilder(context, data, index == _selectedIndex),
+      child: widget.itemBuilder!(context, data, index == _selectedIndex),
       onTap: () {
         setState(() {
           _selectedIndex = index;
         });
         assert(controller != null);
-        controller.select(data, index: index);
+        controller!.select(data, index: index);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return new ListView.builder(
+    return ListView.builder(
       itemExtent: widget.itemExtent,
       itemBuilder: buildItem,
-      itemCount: widget.data.length,
+      itemCount: widget.data!.length,
     );
   }
 
   @override
-  void onEvent(DropdownEvent event) {
+  void onEvent(DropdownEvent? event) {
     switch (event) {
       case DropdownEvent.SELECT:
       case DropdownEvent.HIDE:
@@ -71,6 +73,8 @@ class _MenuListState<T> extends DropdownState<DropdownListMenu<T>> {
         break;
       case DropdownEvent.ACTIVE:
         {}
+        break;
+      default:
         break;
     }
   }
@@ -92,16 +96,16 @@ class DropdownTreeMenu<T, E> extends DropdownWidget {
   final List<T> data;
 
   /// selected index of main list
-  final int selectedIndex;
+  final int? selectedIndex;
 
   /// item builder for main list
-  final MenuItemBuilder<T> itemBuilder;
+  final MenuItemBuilder<T>? itemBuilder;
 
   //selected index of sub list
-  final int subSelectedIndex;
+  final int? subSelectedIndex;
 
   /// A function to build right item of the tree
-  final MenuItemBuilder<E> subItemBuilder;
+  final MenuItemBuilder<E>? subItemBuilder;
 
   /// A callback to get sub list from left list data, eg.
   /// When you set List<MyData> to left,
@@ -112,13 +116,13 @@ class DropdownTreeMenu<T, E> extends DropdownWidget {
   final double itemExtent;
 
   /// `itemExtent` of sub list
-  final double subItemExtent;
+  final double? subItemExtent;
 
   /// background for main list
   final Color background;
 
   /// background for sub list
-  final Color subBackground;
+  final Color? subBackground;
 
   /// flex for main list
   final int flex;
@@ -128,37 +132,37 @@ class DropdownTreeMenu<T, E> extends DropdownWidget {
   final int subFlex;
 
   DropdownTreeMenu({
-    this.data,
-    double itemExtent,
+    super.key,
+    required this.data,
+    double? itemExtent,
     this.selectedIndex,
     this.itemBuilder,
     this.subItemExtent,
     this.subItemBuilder,
-    this.getSubData,
-    this.background: const Color(0xfffafafa),
+    required this.getSubData,
+    this.background = const Color(0xfffafafa),
     this.subBackground,
-    this.flex: 1,
-    this.subFlex: 2,
+    this.flex = 1,
+    this.subFlex = 2,
     this.subSelectedIndex,
-  })  : assert(getSubData != null),
-        itemExtent = itemExtent ?? kDropdownMenuItemHeight;
+  }) : itemExtent = itemExtent ?? kDropdownMenuItemHeight;
 
   @override
   DropdownState<DropdownWidget> createState() {
-    return new _TreeMenuList();
+    return _TreeMenuList<T, E>();
   }
 }
 
-class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
-  int _subSelectedIndex;
-  int _selectedIndex;
+class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu<T, E>> {
+  int? _subSelectedIndex;
+  int? _selectedIndex;
 
   //
-  int _activeIndex;
+  int? _activeIndex;
 
-  List<E> _subData;
+  List<E>? _subData;
 
-  List<T> _data;
+  List<T>? _data;
 
   @override
   void initState() {
@@ -169,14 +173,14 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
     _data = widget.data;
 
     if (_activeIndex != null) {
-      _subData = widget.getSubData(_data[_activeIndex]);
+      _subData = widget.getSubData(_data![_activeIndex!]);
     }
 
     super.initState();
   }
 
   @override
-  void didUpdateWidget(DropdownTreeMenu oldWidget) {
+  void didUpdateWidget(DropdownTreeMenu<T, E> oldWidget) {
     // _selectedIndex = widget.selectedIndex;
     // _subSelectedIndex = widget.subSelectedIndex;
     // _activeIndex = _selectedIndex;
@@ -185,14 +189,14 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
   }
 
   Widget buildSubItem(BuildContext context, int index) {
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: widget.subItemBuilder(context, _subData[index],
+      child: widget.subItemBuilder!(context, _subData![index],
           _activeIndex == _selectedIndex && index == _subSelectedIndex),
       onTap: () {
         assert(controller != null);
-        controller.select(_subData[index],
-            index: _activeIndex, subIndex: index);
+        controller!
+            .select(_subData![index], index: _activeIndex, subIndex: index);
         setState(() {
           _selectedIndex = _activeIndex;
           _subSelectedIndex = index;
@@ -204,9 +208,9 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
   Widget buildItem(BuildContext context, int index) {
     final List<T> list = widget.data;
     final T data = list[index];
-    return new GestureDetector(
+    return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: widget.itemBuilder(context, data, index == _activeIndex),
+      child: widget.itemBuilder!(context, data, index == _activeIndex),
       onTap: () {
         //切换
         //拿到数据
@@ -220,30 +224,30 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return new Row(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        new Expanded(
+        Expanded(
             flex: widget.flex,
-            child: new Container(
-              child: new ListView.builder(
+            child: Container(
+              color: widget.background,
+              child: ListView.builder(
                 itemExtent: widget.itemExtent,
                 itemBuilder: buildItem,
-                itemCount: this._data == null ? 0 : this._data.length,
+                itemCount: this._data == null ? 0 : this._data!.length,
               ),
-              color: widget.background,
             )),
-        new Expanded(
+        Expanded(
             flex: widget.subFlex,
-            child: new Container(
+            child: Container(
               color: widget.subBackground,
-              child: new CustomScrollView(
+              child: CustomScrollView(
                 slivers: <Widget>[
-                  new SliverList(
-                      delegate: new SliverChildBuilderDelegate(
+                  SliverList(
+                      delegate: SliverChildBuilderDelegate(
                     buildSubItem,
                     childCount:
-                        this._subData == null ? 0 : this._subData.length,
+                        this._subData == null ? 0 : this._subData!.length,
                   ))
                 ],
               ),
@@ -253,7 +257,7 @@ class _TreeMenuList<T, E> extends DropdownState<DropdownTreeMenu> {
   }
 
   @override
-  void onEvent(DropdownEvent event) {
+  void onEvent(DropdownEvent? event) {
     // TODO: implement onEvent
   }
 }
